@@ -1,0 +1,36 @@
+
+{
+  "business_name": "Bloom Aesthetics Clinic",
+  "hours": "Monday to Saturday, 9am to 7pm",
+  "closed_days": ["Sunday"],
+  "services": [
+    {
+      "name": "Botox",
+      "price_from": 200,
+      "currency": "GBP",
+      "notes": "Price varies by area treated. Starting from £200."
+    },
+    {
+      "name": "Dermal Fillers",
+      "price_from": 250,
+      "currency": "GBP",
+      "notes": "Price varies by area and amount. Starting from £250."
+    },
+    {
+      "name": "Consultation",
+      "price_from": 0,
+      "currency": "GBP",
+      "notes": "Free initial consultation available."
+    }
+  ],
+  "booking": {
+    "channels": ["WhatsApp", "website"],
+    "cancellation_policy": "24 hours notice required for cancellations"
+  },
+  "escalation_triggers": [
+    "complaint",
+    "medical question",
+    "pricing negotiation",
+    "more than 2 unanswered questions"
+  ]
+}

@@ -1,7 +1,11 @@
 import json
-from anthropic import Anthropic
+import os
+from dotenv import load_dotenv
+from google import genai
 
-client = Anthropic()
+load_dotenv()
+
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # load SOP from file
 def load_sop(path="sop.json"):
@@ -53,9 +57,14 @@ Recommended Next Action: ...
 ---END SUMMARY---
 """
 
-# track conversation and escalations
-conversation_history = []
+# track escalations
 escalation_log = []
+
+# start chat session
+chat_session = client.chats.create(
+    model="gemini-3.1-flash-lite",
+    config={"system_instruction": SYSTEM_PROMPT}
+)
 
 def check_escalation(text):
     if "[ESCALATE:" not in text:
@@ -70,17 +79,8 @@ def log_escalation(reason, user_msg):
     print("Handing off to human agent...\n")
 
 def chat(user_message):
-    conversation_history.append({"role": "user", "content": user_message})
-
-    response = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=conversation_history,
-    )
-
-    reply = response.content[0].text
-    conversation_history.append({"role": "assistant", "content": reply})
+    response = chat_session.send_message(user_message)
+    reply = response.text
 
     # check if AI flagged an escalation
     reason = check_escalation(reply)
@@ -95,7 +95,7 @@ def main():
     print("Bloom Aesthetics Clinic - AI Support")
     print("Type 'bye' or 'end session' to finish.\n")
 
-    # send a silent opening message to get the greeting
+    # send opening message to get greeting
     greeting = chat("Hello, I'd like some information please.")
     print(f"Aria: {greeting}\n")
 
@@ -111,7 +111,7 @@ def main():
 
         reply = chat(user_input)
 
-        # strip the escalation tag before showing to customer
+        # strip escalation tag before showing to customer
         display = reply.replace("[ESCALATE:", "").replace("]", "") if "[ESCALATE:" in reply else reply
         print(f"\nAria: {display}\n")
 
